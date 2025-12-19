@@ -3,8 +3,21 @@ import { OrbitControls, Html } from '@react-three/drei';
 import { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
-function BingoSphere({ spinning, color, result, showResult }) {
-  const meshRef = useRef();
+interface BingoSphereProps {
+  spinning: boolean;
+  color: string;
+  result: ResultInfo | null;
+  showResult: boolean;
+}
+
+interface ResultInfo {
+  letter: string;
+  color: string;
+  number: number;
+}
+
+function BingoSphere({ spinning, color, result, showResult }: BingoSphereProps) {
+  const meshRef = useRef<any>(null);
   const { camera } = useThree();
 
   // Continuous spin during random
@@ -33,14 +46,16 @@ function BingoSphere({ spinning, color, result, showResult }) {
 
       {showResult && result && (
         <Html center transform distanceFactor={1.4}>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-center select-none"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-center select-none">
+            {result.letter} {result.number}
+          </div>
         </Html>
       )}
     </mesh>
   );
 }
 
-const getLetterAndColor = (num) => {
+const getLetterAndColor = (num: number): Omit<ResultInfo, 'number'> => {
   if (num <= 15) return { letter: 'B', color: '#2563eb' };
   if (num <= 30) return { letter: 'I', color: '#dc2626' };
   if (num <= 45) return { letter: 'N', color: '#16a34a' };
@@ -49,8 +64,8 @@ const getLetterAndColor = (num) => {
 };
 
 export default function BingoBallGame() {
-  const [resultInfo, setResultInfo] = useState(null);
-  const [spinning, setSpinning] = useState(false);
+  const [resultInfo, setResultInfo] = useState<ResultInfo | null>(null);
+  const [spinning, setSpinning] = useState<boolean>(false);
 
   const play = () => {
     if (spinning) return;
